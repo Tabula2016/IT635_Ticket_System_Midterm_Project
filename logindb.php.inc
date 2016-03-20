@@ -95,7 +95,24 @@ class loginDB
                 return false;
         }
 
-	
+	public function validateOwnerPrivilege($username)
+	{
+		$username = $this->db->real_escape_string($username);
+		$query = "select Createdby from Tickets where Createdby = '$username';";
+                $results = $this->db->query($query);
+                $row = $results->fetch_assoc();
+
+                if ($row['Createdby'] === $username)
+                {
+                        echo "".PHP_EOL;
+                        echo "Ticket Owner Access granted! Your command has been processed...  ".PHP_EOL;
+                        echo "".PHP_EOL;
+                        return true;
+                }
+                echo "false".PHP_EOL;
+                return false;
+	}
+
 	private function saltPassword($password)
    	{
 		$salt = $this->ini['loginDB']['salt'];
@@ -314,15 +331,112 @@ class loginDB
 		$query = "Insert into Tickets (title, category, Severity, Createdby, description, status, Assignedto) values('$title','$category','$severity','$username','$description','$status','$assignedto');";
 		$results = $this->db->query($query);
 		echo "Ticket has been created!  ".PHP_EOL;
-	}
-	public function ManagerAssign()
-	{}
-
-	public function UpdateTicket()
-	{}
 	
-	public function TicketReport()
-	{}
+	}
+
+	public function ManagerAssign($username, $password, $TicketID, $targetuser)
+	{
+		$username = $this->db->real_escape_string($username);
+		$password = $this->db->real_escape_string($password);
+		
+		 if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+                else if(!$this->validateManagerPrivilege($username))
+                {
+                        echo "User ". $username . "does not have Manager access.".PHP_EOL;
+                        $response = array(
+                                "message"=>"User" . $username . "does not have Manager access",
+                                "result"=>"false");
+                        return $response;
+                }
+		
+		else
+		{
+			$query = "UPDATE Tickets SET assignedto = '$targetuser' where ID = '$TicketID';";
+			$results = $this->db->query($query);
+			echo "Ticket ID: " . $TicketID . " has been assigned to " . $targetuser.PHP_EOL;
+		}
+		
+	}
+		
+	
+	public function ViewOwnedTickets($username, $password)
+	{
+		$username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+
+		if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+		
+		else
+		{
+			 $query = "Select * from Tickets where createdby = '$username';";
+                        $results = $this->db->query($query);
+
+                        if($results->num_rows > 0)
+                        {
+                                while($row = $results->fetch_assoc())
+                                {
+                                        echo " - ID: " . $row["ID"] . " - title: " . $row["title"] . " - Category: " . $row["Category"] . " - Severity: " . $row["Severity"].PHP_EOL;
+                                        echo  " - Created by: " . $row["Createdby"].PHP_EOL;
+                                        echo " - description: " . $row["description"] . " -comments: " . $row["comments"].PHP_EOL;
+                                        echo  " - status: " . $row["status"] . " - Assigned to: " . $row["Assignedto"].PHP_EOL;
+                                        echo "".PHP_EOL;
+                                }
+
+			}
+			else
+			{
+				echo "0 results found.".PHP_EOL;
+			}
+		}
+	}
+	
+	public function AddComment($username, $password, $TicketID, $addcomment)
+	{
+		$username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+		if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+		
+		 else if(!$this->validateManagerPrivilege($username) & !$this->validateOwnerPrivilege($username))
+                {
+                        echo "User ". $username . "does not have proper access.".PHP_EOL;
+                        $response = array(
+                                "message"=>"User" . $username . "does not have proper access",
+                                "result"=>"false");
+                        return $response;
+                }
+
+		
+		else
+		{
+			 $query = "Update Tickets SET comments = '$addcomment' where ID = '$TicketID';";
+                        $results = $this->db->query($query);
+			echo "You have add the following comment: " . $addcomment . " to ticket ID: " . $TicketID.PHP_EOL;
+		}
+	}
 
 	public function ManagerTeamReport()
 	{}

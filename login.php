@@ -144,6 +144,13 @@ for ($i = 0; $i < $argc;$i++)
 	continue;
   }
 
+// -ac is to add a comment to a ticket
+  if ($argv[$i] === '-ac')
+  {
+	$addcomment = $argv[$i + 1];
+	$i++;
+	continue;
+  }
   $cArgs[] = $argv[$i];  
 }
 
@@ -206,6 +213,21 @@ switch ($command)
   case 'CreateTicket':
   $login = new loginDB("login.ini");
   $login->CreateTicket($username, $title, $category, $severity, $description, $status, $assignedto);
+  break;
+
+  case 'AssignTicket':
+  $login = new loginDB("login.ini");
+  $login->ManagerAssign($username, $password, $TicketID, $targetuser);
+  break;
+
+  case 'ViewOwnedTickets':
+  $login = new loginDB("login.ini");
+  $login->ViewOwnedTickets($username,$password);
+  break;
+
+  case 'AddComment':
+  $login = new loginDB("login.ini");
+  $login->AddComment($username, $password, $TicketID, $addcomment);
   break;
 }
 

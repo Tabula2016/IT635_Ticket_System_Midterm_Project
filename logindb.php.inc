@@ -159,10 +159,36 @@ class loginDB
 		{
 			 $query = "insert into login (username,password,privilegeLevel,reportsto) values('$newusername','$newpassword','$privilegeLevel','$reportsto');";
                		 $results = $this->db->query($query);
-			 echo "User" . $newusername . " has been created with " . $privilegeLevel . " access.  The User will report to:  " . $reportsto.PHP_EOL;
+			 echo $this->ViewLastUserCreated($username).PHP_EOL;
 		}
 	}
 
+	 public function ViewLastUserCreated($username)
+        {
+                $username = $this->db->real_escape_string($username);
+
+                        $query = "Select * from login WHERE LoginID =(SELECT MAX(LoginID) from login);";
+                        $results = $this->db->query($query);
+
+                        if($results->num_rows > 0)
+                        {
+                                while($row = $results->fetch_assoc())
+                                {
+                                        echo " - LoginID: " . $row['LoginID'] . " - Username: " . $row['username'] . " - PrivilegeLevel: " . $row['privilegeLevel'].PHP_EOL;
+					echo " - Reportsto: " . $row['reportsto'].PHP_EOL;
+                                }
+
+                }
+                        else
+                        {
+                                echo "0 results for specified results...";
+                        }
+
+
+
+
+        }
+	
 
 	public function ModifyUserRole($username, $password, $targetuser, $privilegeLevel)
 	{
@@ -244,6 +270,36 @@ class loginDB
 
 
 	}
+
+	public function ViewLastTicket($username)
+        {
+                $username = $this->db->real_escape_string($username);
+                
+                        $query = "Select * from Tickets WHERE ID =(SELECT MAX(ID) from Tickets);";
+                        $results = $this->db->query($query);
+
+                        if($results->num_rows > 0)
+                        {
+                                while($row = $results->fetch_assoc())
+                                {
+                                        echo " - ID: " . $row["ID"] . " - title: " . $row["title"] . " - Category: " . $row["Category"] . " - Severity: " . $row["Severity"].PHP_EOL;
+                                        echo  " - Created by: " . $row["Createdby"].PHP_EOL;
+                                        echo " - description: " . $row["description"] . " -comments: " . $row["comments"].PHP_EOL;
+                                        echo  " - status: " . $row["status"] . " - Assigned to: " . $row["Assignedto"].PHP_EOL;
+                                        echo "".PHP_EOL;
+                                }
+
+                }
+                        else
+                        {
+                                echo "0 results for specified results...";
+                        }
+
+                
+
+
+        }
+
 
 	public function DeleteTicket($username, $password, $TicketID)
 	{
@@ -359,6 +415,8 @@ class loginDB
 		$query = "Insert into Tickets (title, category, Severity, Createdby, description, status, Assignedto) values('$title','$category','$severity','$username','$description','$status','$assignedto');";
 		$results = $this->db->query($query);
 		echo "Ticket has been created!  ".PHP_EOL;
+		echo $this->ViewLastTicket($username);
+
 	
 	}
 
@@ -387,7 +445,7 @@ class loginDB
 		
 		else
 		{
-			$query = "UPDATE Tickets SET assignedto = '$targetuser' where ID = '$TicketID';";
+			$query = "UPDATE Tickets SET Assignedto = '$targetuser' where ID = '$TicketID' AND Assignedto IN (SELECT username from login WHERE reportsto = '$username');";
 			$results = $this->db->query($query);
 			echo "Ticket ID: " . $TicketID . " has been assigned to " . $targetuser.PHP_EOL;
 		}

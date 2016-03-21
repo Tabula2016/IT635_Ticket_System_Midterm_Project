@@ -212,22 +212,27 @@ switch ($command)
 
   case 'CreateTicket':
   $login = new loginDB("login.ini");
-  $login->CreateTicket($username, $title, $category, $severity, $description, $status, $assignedto);
+  $login->CreateTicket($username, $title, $category, $severity, $description, $status, $assignedto, $cArgs[0]);
   break;
 
   case 'AssignTicket':
   $login = new loginDB("login.ini");
-  $login->ManagerAssign($username, $password, $TicketID, $targetuser);
+  $login->ManagerAssign($username, $password, $TicketID, $targetuser, $cArgs[0]);
   break;
 
   case 'ViewOwnedTickets':
   $login = new loginDB("login.ini");
-  $login->ViewOwnedTickets($username,$password);
+  $login->ViewOwnedTickets($username,$password,$cArgs[0]);
   break;
 
   case 'AddComment':
   $login = new loginDB("login.ini");
-  $login->AddComment($username, $password, $TicketID, $addcomment);
+  $login->AddComment($username, $password, $TicketID, $addcomment,$cArgs[0]);
+  break;
+
+  case 'ChangeStatus':
+  $login = new loginDB("login.ini");
+  $login->ChangeStatus($username, $password, $status, $TicketID,$cArgs[0]);
   break;
 }
 

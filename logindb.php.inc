@@ -73,7 +73,7 @@ class loginDB
 			echo "".PHP_EOL;
 			return true;
 		}
-		echo "false".PHP_EOL;
+
 		return false;
    	}
 
@@ -91,7 +91,7 @@ class loginDB
                         echo "".PHP_EOL;
                         return true;
                 }
-                echo "false".PHP_EOL;
+                
                 return false;
         }
 
@@ -102,7 +102,7 @@ class loginDB
                 $results = $this->db->query($query);
                 $row = $results->fetch_assoc();
 
-                if ($row['Createdby'] === $username)
+                if ($row['Createdby'] === "$username")
                 {
                         echo "".PHP_EOL;
                         echo "Ticket Owner Access granted! Your command has been processed...  ".PHP_EOL;
@@ -276,7 +276,35 @@ class loginDB
 	}
 
 	public function EditTicket()
-	{}
+	{
+		 $username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+
+                 if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+
+		else if(!$this->validateAdminPrivilege($username))
+                {
+                        echo "User ". $username . "does not have admin access.".PHP_EOL;
+                        $response = array(
+                                "message"=>"User" . $username . "does not have admin access",
+                                "result"=>"false");
+                        return $response;
+                }
+		
+		else 
+		{
+			
+		}
+
+	}
 
 	public function ManagerReportUser($username, $password)
 	{
@@ -437,6 +465,39 @@ class loginDB
 			echo "You have add the following comment: " . $addcomment . " to ticket ID: " . $TicketID.PHP_EOL;
 		}
 	}
+
+	public function ChangeStatus($username, $password, $status, $TicketID)
+	{
+		 $username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+                if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+
+                 else if(!$this->validateManagerPrivilege($username) & !$this->validateOwnerPrivilege($username))
+                {
+                        echo "User ". $username . "does not have proper access.".PHP_EOL;
+                        $response = array(
+                                "message"=>"User" . $username . "does not have proper access",
+                                "result"=>"false");
+                        return $response;
+                }
+		
+		else
+		{
+			 $query = "Update Tickets SET status = '$status' where ID = '$TicketID';";
+                        $results = $this->db->query($query);
+			echo "Ticket ID: " . $TicketID . " status has been changed to: " . $status.PHP_EOL;
+		}
+
+	}
+
 
 	public function ManagerTeamReport()
 	{}

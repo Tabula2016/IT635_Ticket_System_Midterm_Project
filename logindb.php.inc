@@ -357,7 +357,9 @@ class loginDB
 		
 		else 
 		{
-			
+			$query = 
+			$results = $this->db->query($query);
+					
 		}
 
 	}

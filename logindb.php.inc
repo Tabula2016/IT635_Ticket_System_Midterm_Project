@@ -392,6 +392,7 @@ class loginDB
 
 			 if($results->num_rows > 0)
                         {
+				echo "Direct Reports: ".PHP_EOL;
                                 while($row = $results->fetch_assoc())
                                 {
 					echo "".PHP_EOL;
@@ -418,6 +419,31 @@ class loginDB
 		echo $this->ViewLastTicket($username);
 
 	
+	}
+
+	public function AssignTicketToSelf($username, $password, $TicketID)
+	{
+		$username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+		
+		 if(!$this->validateUser($username, $password))
+                 {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                 }
+
+		 else
+                {
+                        $query = "update Tickets, login set Tickets.Assignedto = '$username', login.AssignedTickets = login.AssignedTickets+1 where Tickets.ID = '$TicketID' and login.username ='$username';";
+                        $results = $this->db->query($query);
+                        echo "Ticket ID: " . $TicketID . " has been assigned to " . $username.PHP_EOL;
+                }
+
+
 	}
 
 	public function ManagerAssign($username, $password, $TicketID, $targetuser)
@@ -557,8 +583,55 @@ class loginDB
 	}
 
 
-	public function ManagerTeamReport()
-	{}
+	public function ManagerTeamReport($username, $password)
+	{
+		 $username = $this->db->real_escape_string($username);
+                $password = $this->db->real_escape_string($password);
+                if(!$this->validateUser($username, $password))
+                {
+                        echo "Incorrect password".PHP_EOL;
+                        $response = array(
+                                "message"=>"Incorrect",
+                                "result"=>"false"
+                        );
+                        return $response;
+                }
+
+                 else if(!$this->validateManagerPrivilege($username) & !$this->validateOwnerPrivilege($username))
+                {
+                        echo "User ". $username . "does not have proper access.".PHP_EOL;
+                        $response = array(
+                                "message"=>"User" . $username . "does not have proper access",
+                                "result"=>"false");
+                        return $response;
+                }
+		
+		else
+		{
+			$query = "Select * from Tickets WHERE Assignedto IN (Select username from login where reportsto = '$username');";
+			$results = $this->db->query($query);
+			echo $this->ManagerReportUser($username, $password);
+
+			if($results->num_rows > 0)
+                        {
+				echo "Tickets that team owns: ".PHP_EOL;
+                                while($row = $results->fetch_assoc())
+                                {
+                                        echo " - ID: " . $row["ID"] . " - title: " . $row["title"] . " - Category: " . $row["Category"] . " - Severity: " . $row["Severity"].PHP_EOL;
+                                        echo  " - Created by: " . $row["Createdby"].PHP_EOL;
+                                        echo " - description: " . $row["description"] . " -comments: " . $row["comments"].PHP_EOL;
+                                        echo  " - status: " . $row["status"] . " - Assigned to: " . $row["Assignedto"].PHP_EOL;
+                                        echo "".PHP_EOL;
+                                }
+
+                        }
+                        else
+                        {
+                                echo "0 results found.".PHP_EOL;
+                        }
+
+		}
+	}
 
 
 }

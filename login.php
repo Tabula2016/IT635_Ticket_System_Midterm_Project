@@ -234,6 +234,16 @@ switch ($command)
   $login = new loginDB("login.ini");
   $login->ChangeStatus($username, $password, $status, $TicketID,$cArgs[0]);
   break;
+
+  case 'AssignTicketToSelf':
+  $login = new loginDB("login.ini");
+  $login->AssignTicketToSelf($username, $password, $TicketID, $cArgs[0]);
+  break;
+
+  case 'ManagerTeamReport':
+  $login = new loginDB("login.ini");
+  $login->ManagerTeamReport($username, $password,$cArgs[0]);
+  break;
 }
 
 ?>

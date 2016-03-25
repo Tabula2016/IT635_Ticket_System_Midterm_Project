@@ -151,6 +151,22 @@ for ($i = 0; $i < $argc;$i++)
 	$i++;
 	continue;
   }
+
+// -fn is to specify fieldname when editing ticket
+  if($argv[$i] === '-fn')
+  {
+	$fieldname = $argv[$i + 1];
+	$i++;
+	continue;
+  }
+
+// -in is to specify input that will be entered in field
+  if($argv[$i] === '-in')
+  {
+	$input = $argv[$i + 1];
+	$i++;
+	continue;
+  }
   $cArgs[] = $argv[$i];  
 }
 
@@ -179,11 +195,6 @@ switch ($command)
    $login = new loginDB("login.ini");
    $login->addNewUser($username,$password,$privilegeLevel,$newusername,$newpassword, $reportsto,$cArgs[0]);
     break;
-
-  case 'checkUserloginType':
-  $login = new loginDB("login.ini");
-  $login->checkUserloginType($username, $cArgs[0]);
-  break;
 
   case 'ModifyUserRole':
   $login = new loginDB("login.ini");
@@ -243,6 +254,11 @@ switch ($command)
   case 'ManagerTeamReport':
   $login = new loginDB("login.ini");
   $login->ManagerTeamReport($username, $password,$cArgs[0]);
+  break;
+
+  case 'EditTicket':
+  $login = new loginDB("login.ini");
+  $login->EditTicket($username,$password,$fieldname,$input,$TicketID,$cArgs[0]);
   break;
 }
 

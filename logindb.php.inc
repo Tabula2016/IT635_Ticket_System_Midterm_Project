@@ -331,7 +331,7 @@ class loginDB
 		}
 	}
 
-	public function EditTicket()
+	public function EditTicket($username, $password, $fieldname, $input, $TicketID)
 	{
 		 $username = $this->db->real_escape_string($username);
                 $password = $this->db->real_escape_string($password);
@@ -357,8 +357,9 @@ class loginDB
 		
 		else 
 		{
-			$query = 
+			$query = "UPDATE Tickets SET ". $fieldname . " = '$input' where ID = '$TicketID';";
 			$results = $this->db->query($query);
+			echo "The following changes have been made to: " . $fieldname . "..... information that was entered: " . $input.PHP_EOL;
 					
 		}
 
@@ -577,7 +578,7 @@ class loginDB
 		
 		else
 		{
-			 $query = "Update Tickets SET status = '$status' where ID = '$TicketID';";
+			$query = "Update Tickets SET status = '$status' where ID = '$TicketID';";
                         $results = $this->db->query($query);
 			echo "Ticket ID: " . $TicketID . " status has been changed to: " . $status.PHP_EOL;
 		}

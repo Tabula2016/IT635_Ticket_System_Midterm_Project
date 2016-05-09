@@ -1,1 +1,3 @@
-[{"LoginID"  :"1","username"  :"mohmmad","password"  :"Test123","privilegeLevel"  :"admin","reportsto"  :"ADMINISTRATOR","AssignedTickets"  :"0"},{"LoginID"  :"2","username"  :"paul","password"  :"Test123","privilegeLevel"  :"manager","reportsto"  :"Mohmmad","AssignedTickets"  :"0"},{"LoginID"  :"3","username"  :"user1","password"  :"Test123","privilegeLevel"  :"user","reportsto"  :"paul","AssignedTickets"  :"0"}]
+[{"LoginID"  :"1","username"  :"mohmmad","password"  :"Test123","privilegeLevel"  :"admin","reportsto"  :"ADMINISTRATOR","AssignedTickets"  :"0"},
+{"LoginID"  :"2","username"  :"paul","password"  :"Test123","privilegeLevel"  :"manager","reportsto"  :"Mohmmad","AssignedTickets"  :"0"},
+{"LoginID"  :"3","username"  :"user1","password"  :"Test123","privilegeLevel"  :"user","reportsto"  :"paul","AssignedTickets"  :"0"}]
